@@ -1,9 +1,11 @@
 # Hermes
 AI Financial Crawler.
 
-### Need to Download
+### Requirements
 
-Chromedriver [https://sites.google.com/a/chromium.org/chromedriver/](https://sites.google.com/a/chromium.org/chromedriver/)
+Chromedriver
+[https://sites.google.com/a/chromium.org/chromedriver/](https://sites.google.com/a/chromium.org/chromedriver/)
+
 
 ### About Project Name
 
