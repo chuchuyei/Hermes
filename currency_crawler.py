@@ -15,7 +15,6 @@ try:
 except Exception:
     pass
 
-
 chromeOptions = webdriver.ChromeOptions()
 prefs = {"download.default_directory": file_path}
 chromeOptions.add_experimental_option("prefs", prefs)
