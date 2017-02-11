@@ -7,8 +7,10 @@ import time
 import pandas as pd
 from selenium import webdriver
 from tqdm import tqdm
+from kernel import PreprocessedData
 
-file_path = "/Users/chuchuyei/PycharmProjects/Hermes/data"
+file_path = os.path.join(os.getcwd(), 'data')
+currency_source = 'current_data.xlsx'
 try:
     filename = [f for f in os.listdir(file_path) if 'ExchangeRate@' in f][0]
     os.remove(os.path.join(file_path, filename))
@@ -18,38 +20,19 @@ except Exception:
 chromeOptions = webdriver.ChromeOptions()
 prefs = {"download.default_directory": file_path}
 chromeOptions.add_experimental_option("prefs", prefs)
-chromedriver = "/Users/chuchuyei/chromedriver"
+chromedriver = os.path.join(os.getcwd(), 'chromedriver')
 browser = webdriver.Chrome(executable_path=chromedriver, chrome_options=chromeOptions)
 
 currency = ['USD', 'HKD', 'GBP', 'AUD', 'CAD', 'SGD', 'CHF', 'JPY',
             'ZAR', 'SEK', 'NZD', 'THB', 'PHP', 'IDR', 'EUR', 'KRW',
             'VND', 'MYR', 'CNY',
             ]
-
-def transfer_file(kind_of_currency):
-    while True:
-        try:
-            filename = [f for f in os.listdir(file_path) if 'ExchangeRate@' in f and os.path.splitext(f)[-1] == '.csv'][0]
-            break
-        except Exception:
-            time.sleep(0.1)
-    df = pd.read_csv(os.path.join(file_path, filename))
-    df.reset_index(level=0, inplace=True)
-    df.dropna(axis=1,inplace=True)
-    df.columns = [u'資料日期', u'幣別',
-                  u'買入匯率', u'買入-現金', u'買入-即期', u'買入-遠期10天', u'買入-遠期30天',
-                  u'買入-遠期60天', u'買入-遠期90天', u'買入-遠期120天', u'買入-遠期150天', u'買入-遠期180天',
-                  u'賣出匯率', u'賣出-現金', u'賣出-即期', u'賣出-遠期10天', u'賣出-遠期30天',
-                  u'賣出-遠期60天', u'賣出-遠期90天', u'賣出-遠期120天', u'賣出-遠期150天', u'買入-遠期180天'
-                  ]
-    df[u'資料日期'] = pd.to_datetime(df[u'資料日期'], format='%Y%m%d')
-    df.to_csv(os.path.join(file_path, filename[:12] + '_' + str(kind_of_currency) + filename[12:]),index=False)
-    os.remove(os.path.join(file_path, filename))
+p = PreprocessedData(file_path, currency_source)
 
 with tqdm(total=len(currency)) as pbar:
     for i in currency:
         url = 'http://rate.bot.com.tw/xrt/flcsv/0/l6m/' + str(i)
         browser.get(url)
-        transfer_file(i)
+        p.current_transfer_file(i)
         pbar.update()
 browser.close()
